@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>日記カケイボ</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
@@ -701,7 +702,37 @@ function askIncomeAmt(item){
 function askPay(item){
   clearI();
   addChat(item.type==='expense'?'何で払いましたか？':'どこに入りましたか？','ai');
-  showChoices(PAYS,c=>{item.method=c;addChat(c,'user');S.idx++;setTimeout(askNext,300);});
+  showChoices(PAYS,c=>{item.method=c;addChat(c,'user');checkAndAskTransfer(item);});
+}
+function checkAndAskTransfer(item){
+  const mp={現金:'cash',PayPay:'paypay',銀行:'bank'};
+  const key=mp[item.method];
+  if(!key){S.idx++;setTimeout(askNext,300);return;}
+  const newBalance=S.balances[key]-item.amount;
+  if(newBalance>=0){S.idx++;setTimeout(askNext,300);return;}
+  clearI();
+  addChat(item.method+'の残高が足りません（'+fmt(S.balances[key])+' → '+fmt(newBalance)+'）。どこから補填しますか？','ai');
+  const options=['現金','PayPay','銀行'].filter(p=>p!==item.method);
+  showTransferInput(options,item,key);
+}
+function showTransferInput(options,item,fromKey){
+  const area=document.getElementById('interact-area');
+  const needed=Math.abs(Math.min(S.balances[fromKey]-item.amount,0));
+  area.innerHTML='<div class="amt-row"><input class="amt-in" type="number" id="transfer-amt" placeholder="金額..." value="'+needed+'"></div>'
+    +'<div class="choice-row" style="margin-top:6px">'
+    +options.map(o=>'<button class="choice-btn" onclick="confirmTransfer(\''+o+'\',\''+item.method+'\')">'+o+'から補填</button>').join('')
+    +'</div>';
+}
+function confirmTransfer(fromMethod,toMethod){
+  const amt=parseInt(document.getElementById('transfer-amt').value)||0;
+  if(amt<=0){alert('金額を入力してください');return;}
+  const mp={現金:'cash',PayPay:'paypay',銀行:'bank'};
+  S.balances[mp[fromMethod]]-=amt;
+  S.balances[mp[toMethod]]+=amt;
+  addChat(fromMethod+'から'+fmt(amt)+'補填しました','user');
+  clearI();
+  S.idx++;
+  setTimeout(askNext,300);
 }
 function showAmtInput(def,cb){
   document.getElementById('interact-area').innerHTML='<div class="amt-row"><input class="amt-in" type="number" id="amt-in" placeholder="金額..." value="'+def+'" oninput="onAmtChange()"></div><div id="amt-cat-hint" style="font-size:11px;color:var(--muted);margin:4px 0 4px">金額を入力したらカテゴリを選んでください</div><div id="amt-cat-row" class="choice-row" style="margin-top:2px"></div>';
