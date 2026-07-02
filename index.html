@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>日記カケイボ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -13,7 +13,7 @@
   --white:#fff;--surface:#f4fafd;--border:rgba(36,150,200,0.18);
   --text:#1a3a4a;--muted:#5a8a9f;--green:#2eab7a;--red:#e05a5a;
 }
-body{font-family:'Nunito', sans-serif;background:var(--surface);color:var(--text);min-height:100vh}
+body{font-family:'Zen Maru Gothic', sans-serif;background:var(--surface);color:var(--text);min-height:100vh}
 .nav{background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 10px;height:52px;gap:2px;overflow-x:auto}
 .nav-logo{font-size:18px;font-weight:900;flex-shrink:0;margin-right:6px;letter-spacing:1px}
 .nav-tab{padding:6px 13px;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:none;color:var(--muted);font-family:inherit;transition:all .15s;white-space:nowrap;flex-shrink:0}
@@ -140,6 +140,7 @@ textarea:focus{border-color:var(--sky-mid)}
 .spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.4);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:4px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .mock-badge{display:inline-block;background:#fff3cd;color:#856404;font-size:11px;padding:2px 8px;border-radius:8px;margin-left:6px;border:1px solid #ffc107}
+.nav-logo, button, .main-btn, .nav-tab, .choice-btn, .set-save, .img-btn{font-family:'Fredoka', 'Zen Maru Gothic', sans-serif}
 </style>
 </head>
 <body>
