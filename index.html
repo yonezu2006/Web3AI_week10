@@ -181,6 +181,11 @@ textarea:focus{border-color:var(--sky-mid)}
     <div id="trend-line-area"><div class="empty">まだ記録がありません</div></div>
     <div id="trend-cat-area" style="display:none"><div class="empty">まだ記録がありません</div></div>
   </div>
+
+  <div class="sec">収入推移</div>
+  <div class="chart-wrap" style="padding-bottom:8px">
+    <div id="income-trend-area"><div class="empty">まだ記録がありません</div></div>
+  </div>
   <div class="sec">最近の記録</div>
   <div class="recent-list" id="recent-list"><div class="rec-item"><div class="empty" style="width:100%">まだ記録がありません</div></div></div>
 </div>
@@ -346,9 +351,9 @@ function get12MonthKeys(){
   }
   return keys;
 }
-function getMonthlyData(){
+function getMonthlyData(txType){
   const monthly={};
-  S.transactions.filter(t=>t.type==='expense').forEach(t=>{
+  S.transactions.filter(t=>t.type===(txType||'expense')).forEach(t=>{
     let key;
     const m1=t.date.match(/(\d+)年(\d+)月/);
     const m2=t.date.match(/(\d+)月/);
@@ -420,14 +425,21 @@ function drawLineChart(containerId, keys, vals, color, gradId){
 }
 
 function renderTrendLine(){
-  const monthly=getMonthlyData();
+  const monthly=getMonthlyData('expense');
   const area=document.getElementById('trend-line-area');
   const keys=get12MonthKeys();
   const vals=keys.map(k=>monthly[k]?monthly[k].total:0);
   area.innerHTML=drawLineChart('trend-line-area',keys,vals,'#2496c8','lgBlue');
 }
+function renderIncomeTrend(){
+  const monthly=getMonthlyData('income');
+  const area=document.getElementById('income-trend-area');
+  const keys=get12MonthKeys();
+  const vals=keys.map(k=>monthly[k]?monthly[k].total:0);
+  area.innerHTML=drawLineChart('income-trend-area',keys,vals,'#2eab7a','lgGreen');
+}
 function renderTrendCat(){
-  const monthly=getMonthlyData();
+  const monthly=getMonthlyData('expense');
   const area=document.getElementById('trend-cat-area');
   const keys=get12MonthKeys();
   // 使われているカテゴリを収集
@@ -441,7 +453,7 @@ function renderTrendCat(){
     +drawLineChart('trend-cat-area',keys,vals,'#ec4899','lgPink');
 }
 function selectTrendCat(cat){S._trendCat=cat;renderTrendCat();}
-function renderTrend(){renderTrendLine();renderTrendCat();}
+function renderTrend(){renderTrendLine();renderTrendCat();renderIncomeTrend();}
 function diaryCardHTML(d,realIdx){
   const tags=[...new Set((d.transactions||[]).map(t=>t.category))];
   const thumb=d.img?`<img class="diary-thumb" src="${d.img}">`:'';
@@ -555,7 +567,7 @@ async function analyzeDiary(){
       type:it.type==='income'?'income':'expense',
       description:it.description||'項目',
       sourceText:it.sourceText||text,
-      category:it.category||'その他',
+      category:it.type==='income'?'収入':(it.category||'その他'),
       incomeType:it.incomeType||null,
       amount:null,
       method:null,
